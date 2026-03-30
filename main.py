@@ -26,8 +26,8 @@ for _ in range(NUM_SQUARES):
     # max speed 5, min speed 1
     # dx = random.choice([1, 2, 3, 4, 5])
     # dy = random.choice([1, 2, 3, 4, 5])
-    dx = int((20/size) * 20)
-    dy = int((20/size) * 20)
+    dx = int((20/size) * 10)
+    dy = int((20/size) * 10)
 
 
     squares.append([x, y, dx, dy, size, color])
