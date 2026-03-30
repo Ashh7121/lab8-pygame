@@ -3,55 +3,60 @@ import random
 
 pygame.init()
 
-# Screen stufg
+# Screen stuff
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Moving Squares")
 
-WHITE = (255, 255, 255)
-BLUE = (0, 100, 255)
 
-NUM_SQUARES = 10
-SQUARE_SIZE = 30
+NUM_SQUARES = 100
+
+COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
+
+SIZES = []
 
 squares = []
 for _ in range(NUM_SQUARES):
-    x = random.randint(0, WIDTH - SQUARE_SIZE)
-    y = random.randint(0, HEIGHT - SQUARE_SIZE)
-    dx = random.choice([-3, -2, -1, 1, 2, 3])
-    dy = random.choice([-3, -2, -1, 1, 2, 3])
-    squares.append([x, y, dx, dy])
+    size = random.randint(1, 100)
+    color = random.choice(COLORS)
 
-# Game loop
+    x = random.randint(0, WIDTH - size)
+    y = random.randint(0, HEIGHT - size)
+    
+    # max speed 5, min speed 1
+    # dx = random.choice([1, 2, 3, 4, 5])
+    # dy = random.choice([1, 2, 3, 4, 5])
+    dx = int((20/size) * 20)
+    dy = int((20/size) * 20)
+
+
+    squares.append([x, y, dx, dy, size, color])
+
+
 running = True
 clock = pygame.time.Clock()
 
 while running:
-    screen.fill(WHITE)
+    screen.fill((75, 30, 75))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # Update and draw squares
     for square in squares:
-        x, y, dx, dy = square
+        x, y, dx, dy, size, color = square
 
-        # Move
         x += dx
         y += dy
 
-        # Bounce off edges
-        if x <= 0 or x >= WIDTH - SQUARE_SIZE:
+        # Bouncy bouncy
+        if x <= 0 or x >= WIDTH - size:
             dx *= -1
-        if y <= 0 or y >= HEIGHT - SQUARE_SIZE:
+        if y <= 0 or y >= HEIGHT - size:
             dy *= -1
 
-        # Update values
         square[0], square[1], square[2], square[3] = x, y, dx, dy
-
-        # Draw square
-        pygame.draw.rect(screen, BLUE, (x, y, SQUARE_SIZE, SQUARE_SIZE))
+        pygame.draw.rect(screen, color, (x, y, size, size))
 
     pygame.display.flip()
     clock.tick(60)
