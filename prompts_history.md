@@ -23,3 +23,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 02-04-2026 14:14
 - **Prompt**: if dx = 5 and dy = 0, it's basically moving 5 on the horizontal axis and nothing in the vertical axis.  The line now points to east, line length does not change.   Speed stays the same cause it just rotates.  Hmmmm it would look like me when I'm lost in Paris. Going back and forth. I assume that when this happens really fast, it looks like the squares are shaking.
 
+### 02-04-2026 14:23
+- **Prompt**: Add these to the journal cmon how many times do i gotta remind
+
