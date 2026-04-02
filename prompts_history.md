@@ -11,3 +11,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 30-03-2026 14:10
 - **Prompt**: We need to store two extra values for each square: its **size** and its **color**, so each square will have `[x, y, dx, dy, size, color]`.  We can use a small set of predefined colors (like red, green, blue) and assign each square a random color from that set.  We can define a few different sizes (e.g., 20, 30, 40) and randomly assign one to each square  These properties (size and color) should be assigned when the squares are first created, inside the loop where we initialize them.
 
+### 02-04-2026 14:08
+- **Prompt**: Are you logging all this in the journal?
+
