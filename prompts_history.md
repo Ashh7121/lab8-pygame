@@ -17,3 +17,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 02-04-2026 14:08
 - **Prompt**: Please append entries to JOURNAL.md for the following interactions. Use the template from .github/agents/journal-logger.agent.md:  1. First entry: User asked how to make squares jitter when they move by implementing a 'small rotation of the speed vector'. I explained two approaches: (a) rotating velocity by a small angle every frame for smooth continuous jitter, or (b) randomly rotating velocity each frame for choppy jitter. Provided the math formula using cos/sin rotation and example code snippets for both strategies.  2. Second entry: User asked if I'm logging to the journal. No code changes occurred.  Please log both entries chronologically at the end of JOURNAL.md.
 
+### 02-04-2026 14:11
+- **Prompt**: Okay cool, now I want to really understand what it means to apply a small rotation to the vectors to make it look like they are jittering
+
