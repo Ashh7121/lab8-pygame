@@ -1,5 +1,6 @@
 import pygame
 import random
+import math  # added
 
 pygame.init()
 
@@ -24,12 +25,8 @@ for _ in range(NUM_SQUARES):
     x = random.randint(0, WIDTH - size)
     y = random.randint(0, HEIGHT - size)
     
-    # max speed 5, min speed 1
-    # dx = random.choice([1, 2, 3, 4, 5])
-    # dy = random.choice([1, 2, 3, 4, 5])
     dx = int((20/size) * 10)
     dy = int((20/size) * 10)
-
 
     squares.append([x, y, dx, dy, size, color])
 
@@ -46,6 +43,17 @@ while running:
 
     for square in squares:
         x, y, dx, dy, size, color = square
+
+        # jitteringg
+        if random.random() < 0.4:  # happens sometimes, not every frame
+            angle = random.uniform(-0.5, 0.5) # angle change
+            cos_a = math.cos(angle)
+            sin_a = math.sin(angle)
+
+            new_dx = dx * cos_a - dy * sin_a
+            new_dy = dx * sin_a + dy * cos_a
+
+            dx, dy = new_dx, new_dy
 
         x += dx
         y += dy
