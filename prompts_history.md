@@ -26,3 +26,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 02-04-2026 14:23
 - **Prompt**: Add these to the journal cmon how many times do i gotta remind
 
+### 02-04-2026 14:23
+- **Prompt**: Please append the following entries to JOURNAL.md in chronological order at the end:  1. User demonstrated deep understanding of velocity vector rotation for jittering: explained that dx=5, dy=0 moves purely horizontal, rotation preserves speed but changes direction, and rapid direction changes create visual jitter. Used brilliant analogy of walking lost in Paris. I confirmed their understanding and offered implementation choice (smooth vs. choppy jitter).  2. User reminded me to log to journal. No code changes.  Please log both entries using the template from .github/agents/journal-logger.agent.md with timestamps.
+
