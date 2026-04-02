@@ -11,6 +11,7 @@ pygame.display.set_caption("Moving Squares")
 
 NUM_SQUARES = 100
 
+
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
 
 SIZES = []
