@@ -38,3 +38,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:35
 - **Prompt**: It's confusing cause the (x, y) coordinate is for the top left of the square, not the center
 
+### 07-04-2026 11:43
+- **Prompt**: center's horizontal coordinate would be the x coordinate of the square (top left) plus 0.5x and the vertical coordinate of the center would be the y coordinate of the top left minus 0.5y
+
