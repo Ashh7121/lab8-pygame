@@ -18,7 +18,7 @@ COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
 SIZES = []
 
 # TODO: Add a constant for the flee threshold buffer
-# FLEE_BUFFER = ?
+FLEE_BUFFER = 20
 
 squares = []
 for _ in range(NUM_SQUARES):
@@ -28,8 +28,8 @@ for _ in range(NUM_SQUARES):
     x = random.randint(0, WIDTH - size)
     y = random.randint(0, HEIGHT - size)
     
-    dx = int((20/size) * 10)
-    dy = int((20/size) * 10)
+    dx = int((20/size) * 5)
+    dy = int((20/size) * 5)
 
     squares.append([x, y, dx, dy, size, color])
 
@@ -72,18 +72,31 @@ while running:
         pygame.draw.rect(screen, color, (x, y, size, size))
 
     # TODO: NESTED LOOP SECTION
-    # Add a nested loop here to check all pairs of squares
-    # Outer loop: for i in range(len(squares)):
-    # Inner loop: for j in range(i+1, len(squares)):
-    #     Inside the loops:
-    #     1. Extract data from squares[i] and squares[j]
-    #     2. Calculate center coordinates for both squares
-    #     3. Calculate distance between centers using Pythagorean theorem
-    #     4. Calculate the flee threshold (sum of sizes + buffer)
-    #     5. Check if distance < threshold
-    #     6. If yes, determine which is smaller and which is bigger
-    #     7. If square[i] is smaller than square[j], reverse square[i]'s velocity
-    #     8. If square[j] is smaller than square[i], reverse square[j]'s velocity
+    for i in range(len(squares)):
+        for j in range(i + 1, len(squares)):
+            s1 = squares[i]
+            s2 = squares[j]
+
+            x1, y1, dx1, dy1, size1, _ = s1
+            x2, y2, dx2, dy2, size2, _ = s2
+
+            # centers
+            cx1, cy1 = x1 + size1 / 2, y1 + size1 / 2
+            cx2, cy2 = x2 + size2 / 2, y2 + size2 / 2
+
+            # distance
+            dist = math.sqrt((cx2 - cx1)**2 + (cy2 - cy1)**2)
+
+            # flee threshold
+            threshold = size1 + size2 + FLEE_BUFFER
+
+            if dist < threshold:
+                if size1 < size2:
+                    s1[2] *= -1
+                    s1[3] *= -1
+                elif size2 < size1:
+                    s2[2] *= -1
+                    s2[3] *= -1
 
     fps = clock.get_fps()
     fps_text = font.render(f"FPS: {fps:.2f}", True, (255, 255, 255))
