@@ -41,3 +41,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:43
 - **Prompt**: center's horizontal coordinate would be the x coordinate of the square (top left) plus 0.5x and the vertical coordinate of the center would be the y coordinate of the top left minus 0.5y
 
+### 07-04-2026 11:44
+- **Prompt**: So so if the coordinate of the top left is (10, 10) and the size of the square is 4 by 4, the center's coordinates are (12, 12)
+
