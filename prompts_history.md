@@ -32,3 +32,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:32
 - **Prompt**: Read the main.py. I need to add a new feature that makes the smaller squares flee away from the bigger ones. Here is what I am thinking: I think that we can approach this like a collision but instead of having the smaller squares moving in the opposite direction when they HIT the bigger squares, we can adjust the code so that they flee BEFORE they even hit the square so it looks like they are fleeing from the bigger squares. It's just an idea for now but that's what I got for now. Don't tell me the solution outright. Progressively move to the solution as I understand the logic
 
+### 07-04-2026 11:34
+- **Prompt**: 1. I'd have to check the x and y coordinates of the squares and if they are in proximity of each other 2. Only how close they are. The smaller squares should not touch the bigger squares 3. Move directly away from the big square. Like it just reverses its movement vector
+
