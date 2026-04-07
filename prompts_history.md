@@ -77,3 +77,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 21:47
 - **Prompt**: It should be base don the squares' sizes
 
+### 07-04-2026 21:48
+- **Prompt**: I think it would be more appropriate to have the sum plus some extra buffer so it looks like the small square is fleeing as soon as it sees the big square coming toward it
+
