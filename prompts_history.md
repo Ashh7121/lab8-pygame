@@ -71,3 +71,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 21:46
 - **Prompt**: Ahhh so we'd compare the same thing. That makes sense. It simply prevents comparison of the same square and it saves time, processing power and memory
 
+### 07-04-2026 21:47
+- **Prompt**: Distance from the squares' centers should be greater than a pre-determined value
+
