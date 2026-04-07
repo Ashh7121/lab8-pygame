@@ -35,3 +35,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:34
 - **Prompt**: 1. I'd have to check the x and y coordinates of the squares and if they are in proximity of each other 2. Only how close they are. The smaller squares should not touch the bigger squares 3. Move directly away from the big square. Like it just reverses its movement vector
 
+### 07-04-2026 11:35
+- **Prompt**: It's confusing cause the (x, y) coordinate is for the top left of the square, not the center
+
