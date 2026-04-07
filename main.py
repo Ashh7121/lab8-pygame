@@ -1,6 +1,6 @@
 import pygame
 import random
-import math  # added
+import math
 
 pygame.init()
 
@@ -10,7 +10,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Moving Squares")
 
 
-NUM_SQUARES = 100
+NUM_SQUARES = 10
 
 
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
@@ -33,6 +33,7 @@ for _ in range(NUM_SQUARES):
 
 running = True
 clock = pygame.time.Clock()
+font = pygame.font.SysFont(None, 30)
 
 while running:
     screen.fill((75, 30, 75))
@@ -66,6 +67,10 @@ while running:
 
         square[0], square[1], square[2], square[3] = x, y, dx, dy
         pygame.draw.rect(screen, color, (x, y, size, size))
+
+    fps = clock.get_fps()
+    fps_text = font.render(f"FPS: {fps:.2f}", True, (255, 255, 255))
+    screen.blit(fps_text, (10, 10))
 
     pygame.display.flip()
     clock.tick(60)
