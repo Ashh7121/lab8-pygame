@@ -50,3 +50,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:47
 - **Prompt**: Yes i'm thinking of a standard math coordinate system. Does it not work that way in pygame?
 
+### 07-04-2026 11:49
+- **Prompt**: Use the distance formula between the 2 centers. And then we factor in each square's sizes
+
