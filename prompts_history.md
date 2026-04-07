@@ -65,3 +65,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:55
 - **Prompt**: Log this conversation to JOURNAL.md. The user asked about implementing a "flee" feature for smaller squares to move away from bigger ones before collision. We discussed:  1. Detection approach: checking proximity of squares using coordinates 2. Distance calculation: measuring center-to-center distance using Pythagorean theorem 3. Center coordinates: understanding that center = (x + size/2, y + size/2) in Pygame (where y increases downward) 4. Loop structure: starting to discuss nested loops for checking all pairs of squares  Key concepts covered: - Pygame coordinate system (y increases downward, origin at top-left) - Pythagorean distance formula: distance = math.sqrt((x2-x1)^2 + (y2-y1)^2) - Pair iteration: nested loops with i in range(len(squares)) and j in range(i+1, len(squares))  No code changes have been made yet. We're still in the planning/teaching phase following the Socratic method. The user is being guided to understand the logic before implementation.
 
+### 07-04-2026 21:45
+- **Prompt**: I don't know
+
