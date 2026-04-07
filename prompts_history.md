@@ -68,3 +68,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 21:45
 - **Prompt**: I don't know
 
+### 07-04-2026 21:46
+- **Prompt**: Ahhh so we'd compare the same thing. That makes sense. It simply prevents comparison of the same square and it saves time, processing power and memory
+
