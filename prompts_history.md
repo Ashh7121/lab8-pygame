@@ -56,3 +56,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:51
 - **Prompt**: distance = math.sqrt(((x2 - x1) ** 2) + ((y2 - y1) ** 2))
 
+### 07-04-2026 11:53
+- **Prompt**: A for loop that goes through every square? There would be N^2 pairs? I'm really not sure about that one
+
