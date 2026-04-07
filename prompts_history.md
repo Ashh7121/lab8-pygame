@@ -74,3 +74,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 21:47
 - **Prompt**: Distance from the squares' centers should be greater than a pre-determined value
 
+### 07-04-2026 21:47
+- **Prompt**: It should be base don the squares' sizes
+
