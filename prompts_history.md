@@ -53,3 +53,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:49
 - **Prompt**: Use the distance formula between the 2 centers. And then we factor in each square's sizes
 
+### 07-04-2026 11:51
+- **Prompt**: distance = math.sqrt(((x2 - x1) ** 2) + ((y2 - y1) ** 2))
+
