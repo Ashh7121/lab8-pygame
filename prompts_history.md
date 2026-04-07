@@ -47,3 +47,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 11:45
 - **Prompt**: It's not (12, 12). It's (12, 8) because we need to move down to get the center for the y coordinate
 
+### 07-04-2026 11:47
+- **Prompt**: Yes i'm thinking of a standard math coordinate system. Does it not work that way in pygame?
+
