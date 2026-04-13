@@ -89,3 +89,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 07-04-2026 22:13
 - **Prompt**: Log the following unlogged interactions to JOURNAL.md at the end:  1. Nested loop structure discussion: Explained why inner loop starts at i+1 instead of 0 to avoid:    - Comparing a square with itself    - Redundant pair comparisons (avoiding duplicate work)    - Saves processing power and memory  2. Flee range threshold discussion:    - User decided threshold should be based on square sizes    - User decided it should be: size1 + size2 + extra buffer    - Reasoning: gives natural anticipatory flee behavior, makes escape look more natural  3. Code artifact created:    - Created fleeingfeature.py as a guided implementation file    - Added TODO comments for each step of the nested loop implementation    - File contains stubs and clear guidance for:      - FLEE_BUFFER constant      - Nested loop structure      - Center coordinate calculation      - Distance calculation using Pythagorean theorem      - Threshold comparison      - Size comparison logic      - Velocity reversal logic  4. Still in Socratic teaching mode - guiding user through logic before full implementation 5. About to ask: How to compare sizes of two squares to determine which is smaller/bigger
 
+### 13-04-2026 14:15
+- **Prompt**: Activate the journal logger agent
+
