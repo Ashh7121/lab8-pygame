@@ -95,3 +95,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 13-04-2026 14:15
 - **Prompt**: Activate the journal logger to start logging interactions to JOURNAL.md. Initialize the journal file if it doesn't exist and ensure it's ready to receive new entries in chronological order.
 
+### 13-04-2026 14:17
+- **Prompt**: Generate the code explorer site for this project. On fleeingfeature file
+
