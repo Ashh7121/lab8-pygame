@@ -104,3 +104,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 16-04-2026 20:15
 - **Prompt**: I want to implement a lifespan for each square. Between 10 and 15 seconds. When the square's time is up, it smoothly disappears and another square is born. Don't show me any code, just point me to the logic/idea that's in the right direction
 
+### 16-04-2026 20:23
+- **Prompt**: Did you record this in the journal? If not, do it
+
