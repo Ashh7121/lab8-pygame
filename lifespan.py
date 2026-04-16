@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import time
 
 pygame.init()
 
@@ -8,7 +9,7 @@ WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Moving Squares")
 
-NUM_SQUARES = 10
+NUM_SQUARES = 15
 
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
 
@@ -22,35 +23,73 @@ for _ in range(NUM_SQUARES):
     x = random.uniform(0, WIDTH - size)
     y = random.uniform(0, HEIGHT - size)
     
-    speed = (20 / size) * 120  # ✅ pixels per second
+    speed = (20 / size) * 120
     angle = random.uniform(0, 2 * math.pi)
 
     dx = math.cos(angle) * speed
     dy = math.sin(angle) * speed
 
-    squares.append([x, y, dx, dy, size, color])
+    # lifedpan
+    birth_time = time.time()
+    lifespan = random.uniform(10, 15)
+
+    squares.append([x, y, dx, dy, size, color, birth_time, lifespan])  # ✅ MODIFIED
 
 running = True
 clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 30)
 
 while running:
-    dt = clock.tick(60) / 1000  # ✅ delta time
+    dt = clock.tick(60) / 1000
 
     screen.fill((75, 30, 75))
+
+    current_time = time.time()  # ✅ ADDED
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+    new_squares = []
+
     for square in squares:
-        x, y, dx, dy, size, color = square
+        x, y, dx, dy, size, color, birth_time, lifespan = square  # ✅ MODIFIED
 
-        speed = math.hypot(dx, dy)  # ✅ preserve speed
+        age = current_time - birth_time
+        fade_duration = 1.5  # seconds
 
-        # smoother jitter
+        # alpha stuff
+        if age < lifespan - fade_duration:
+            alpha = 255
+        else:
+            fade_progress = (age - (lifespan - fade_duration)) / fade_duration
+            fade_progress = max(0, min(1, fade_progress))
+            alpha = int(255 * (1 - fade_progress))
+
+        # if dead, replace
+        if age >= lifespan:
+            size = random.randint(1, 100)
+            color = random.choice(COLORS)
+
+            x = random.uniform(0, WIDTH - size)
+            y = random.uniform(0, HEIGHT - size)
+
+            speed = (20 / size) * 120
+            angle = random.uniform(0, 2 * math.pi)
+
+            dx = math.cos(angle) * speed
+            dy = math.sin(angle) * speed
+
+            birth_time = current_time
+            lifespan = random.uniform(10, 15)
+
+            new_squares.append([x, y, dx, dy, size, color, birth_time, lifespan])
+            continue  # skip rest of old square
+
+        speed = math.hypot(dx, dy)
+
         if random.random() < 0.4 * dt * 60:
-            angle = random.uniform(-0.3, 0.3)  # smaller rotation
+            angle = random.uniform(-0.3, 0.3)
             cos_a = math.cos(angle)
             sin_a = math.sin(angle)
 
@@ -81,17 +120,23 @@ while running:
             y = HEIGHT - size
             dy *= -1
 
-        square[0], square[1], square[2], square[3] = x, y, dx, dy
-        pygame.draw.rect(screen, color, (int(x), int(y), size, size))  # ✅ clean rendering
+        
+        temp_surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        temp_surface.fill((*color, alpha))
+        screen.blit(temp_surface, (int(x), int(y)))
 
-    # interactions
+        new_squares.append([x, y, dx, dy, size, color, birth_time, lifespan])  # ✅ MODIFIED
+
+    squares = new_squares
+
+    # interactions (UNCHANGED)
     for i in range(len(squares)):
         for j in range(i + 1, len(squares)):
             s1 = squares[i]
             s2 = squares[j]
 
-            x1, y1, dx1, dy1, size1, _ = s1
-            x2, y2, dx2, dy2, size2, _ = s2
+            x1, y1, dx1, dy1, size1, _, _, _ = s1
+            x2, y2, dx2, dy2, size2, _, _, _ = s2 
 
             cx1, cy1 = x1 + size1 / 2, y1 + size1 / 2
             cx2, cy2 = x2 + size2 / 2, y2 + size2 / 2
