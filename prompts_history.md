@@ -101,3 +101,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 13-04-2026 14:17
 - **Prompt**: Generate a comprehensive code explorer dashboard for the fleeingfeature.py file located at c:\Users\suraj\OneDrive\lab8-pygame\fleeingfeature.py. Create an interactive HTML dashboard that includes: 1. File structure and architecture overview 2. Function/class analysis with dependencies 3. Mermaid diagrams showing control flow and relationships 4. Pattern identification and best practices 5. Performance notes if applicable 6. Key concepts and learning points 7. Visual navigation between components  Make it pedagogically valuable for understanding the code's purpose, design, and implementation details.
 
+### 16-04-2026 20:15
+- **Prompt**: I want to implement a lifespan for each square. Between 10 and 15 seconds. When the square's time is up, it smoothly disappears and another square is born. Don't show me any code, just point me to the logic/idea that's in the right direction
+
