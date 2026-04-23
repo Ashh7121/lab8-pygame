@@ -131,3 +131,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 23-04-2026 11:13
 - **Prompt**: Both at the same time
 
+### 23-04-2026 11:24
+- **Prompt**: Look at the code right now. It is doing the job but the squares are like getting stuck in the corner from trying to bounce off the edge
+
