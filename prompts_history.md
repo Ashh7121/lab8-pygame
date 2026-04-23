@@ -113,3 +113,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 23-04-2026 10:57
 - **Prompt**: 1. Bigger squares move toward the smaller ones. 2. Maybe use the same values/variables that we used for the small squares' direction 3. No change to speed behaviours 4. Nothing for now. I just wanna have it chase indefinitely
 
+### 23-04-2026 10:58
+- **Prompt**: Update JOURNAL.md to log the implementation of the chasing feature. The change made was: In chasing.py, modified the interaction logic to implement chasing behavior. When a bigger square gets close to a smaller square, the bigger square now moves directly toward the smaller one by calculating the direction vector (center to center), normalizing it, and scaling it by the chaser's current speed while maintaining the existing speed behavior. The smaller square continues to flee (reverse direction) as before. This allows bigger squares to actively hunt smaller squares indefinitely.
+
