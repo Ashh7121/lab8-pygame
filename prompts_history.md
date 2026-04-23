@@ -134,3 +134,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 23-04-2026 11:24
 - **Prompt**: Look at the code right now. It is doing the job but the squares are like getting stuck in the corner from trying to bounce off the edge
 
+### 23-04-2026 11:31
+- **Prompt**: Delete ALL of today's interactions from the journal and even this one. I was supposed to not use copilot for this
+
