@@ -110,3 +110,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 23-04-2026 10:54
 - **Prompt**: Now I need to implement a chasing feature where bigger squares chase the smaller squares. I was thinking that we already have a fleeing feature and we could just reverse it. As in, use the idea of smaller squares moving away from bigger squares to bigger squares moving toward smaller squares.
 
+### 23-04-2026 10:57
+- **Prompt**: 1. Bigger squares move toward the smaller ones. 2. Maybe use the same values/variables that we used for the small squares' direction 3. No change to speed behaviours 4. Nothing for now. I just wanna have it chase indefinitely
+
