@@ -13,3 +13,5 @@ For the fleeing, I thought that I'd handle it like I'd handle collision. Only in
 
 
 Now we gotta have a lifespan. All squares have a random lifespan between 30 and 180 seconds for example and they die at the end of their lifespan butttt each time a square dies, another one is reborn. On top of that, I want to make it like thet shrink till they die as an idea to implement on top of it, so I can visibly see them dying instead of them disappearing in an ugly way. 
+
+Chasing feature. Bigger squares chase smaller squares. Initial thoughts are that I need to reverse what we did for the fleeing feature. In the fleeing, small squares move away from the big squares but here, big squaresmove toward the small squares.

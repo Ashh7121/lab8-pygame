@@ -1,4 +1,6 @@
 # lab8-pygame
 The program usesthe Python library pygame to open a window and animate 100 squares moving around the screen. Each square is given a random size, colour and starting position, and its speed is calculated so that smaller squares move faster while larger ones move slower. The program runs in a continuous loop where it clears the screen, updates the position of each square using simple x and y (velocity?)values, and redraws them every frame. When a square reaches the edge of the window, its direction is reversed so it appears to bounce off the walls.  the program stops when the user closes the window.
 
-FOr every new feature as from the fleeing, there is a new file so I was able to preserve the initial code if I need it sometime. Fleeing and lifespan have their separate files.
+There is a new file so I was able to preserve the initial code if I need it sometime. Fleeing and lifespan have their separate files.
+
+As asked, I did the last version of the code on main.py
