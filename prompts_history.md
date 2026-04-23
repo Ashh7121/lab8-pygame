@@ -119,3 +119,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 23-04-2026 11:01
 - **Prompt**: Here's the deal. I apologise for not mentioning it but I did NOT want you to write the code for me. I want you to guide me and correct me with the logic and brainstorming. I undid your changes on the file
 
+### 23-04-2026 11:08
+- **Prompt**: To make it look more natural, Iâ€™d probably use a steering approach. Instead of replacing the current dx and dy entirely, I could add a small fraction of that chase vector to the current direction. If we only let the chase vector influence the path by maybe a little bit each frame, the square will have to curve its way toward the target. It creates this cool ahh arc in the movement, almost like it has momentum
+
