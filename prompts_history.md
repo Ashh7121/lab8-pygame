@@ -107,3 +107,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 16-04-2026 20:23
 - **Prompt**: Did you record this in the journal? If not, do it
 
+### 23-04-2026 10:54
+- **Prompt**: Now I need to implement a chasing feature where bigger squares chase the smaller squares. I was thinking that we already have a fleeing feature and we could just reverse it. As in, use the idea of smaller squares moving away from bigger squares to bigger squares moving toward smaller squares.
+
