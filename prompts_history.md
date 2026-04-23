@@ -128,3 +128,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 23-04-2026 11:12
 - **Prompt**: Same steering distance regardless of distance
 
+### 23-04-2026 11:13
+- **Prompt**: Both at the same time
+
