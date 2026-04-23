@@ -122,3 +122,6 @@ Automatically captured prompt log. Entries are appended in chronological order (
 ### 23-04-2026 11:08
 - **Prompt**: To make it look more natural, Iâ€™d probably use a steering approach. Instead of replacing the current dx and dy entirely, I could add a small fraction of that chase vector to the current direction. If we only let the chase vector influence the path by maybe a little bit each frame, the square will have to curve its way toward the target. It creates this cool ahh arc in the movement, almost like it has momentum
 
+### 23-04-2026 11:11
+- **Prompt**: To get a vector pointing from the chaser to the prey, it's basically just subtraction. If I want to go to the prey from the chaser, Iâ€™d take the targetâ€™s center and subtract the chaser's center: target_dx = cx2 - cx1 and target_dy = cy2 - cy1. That gives me the raw direction and the distance all in one go  For the fraction, I think starting with a constant like 0.1 or even 0.05 makes sense for a baseline.  As for normalizing, I definitely think I should normalize the chase vector first. If I don't, the steering force would be massive?
+
