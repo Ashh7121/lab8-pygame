@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pygame Squares - Architecture Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        main {
+            padding: 40px;
+        }
+        
+        section {
+            margin-bottom: 60px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 40px;
+        }
+        
+        section:last-child {
+            border-bottom: none;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .diagram-container {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+        
+        .mermaid {
+            display: inline-block;
+            min-width: 100%;
+        }
+        
+        .description {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            line-height: 1.8;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        
+        table thead {
+            background: #667eea;
+            color: white;
+        }
+        
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tbody tr:hover {
+            background: #f5f5f5;
+        }
+        
+        table tbody tr:nth-child(odd) {
+            background: #f9f9f9;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: "Courier New", monospace;
+            font-size: 0.9em;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: "Courier New", monospace;
+            font-size: 0.9em;
+            margin: 20px 0;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .overview {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 1.05em;
+            line-height: 1.8;
+        }
+        
+        footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .toc {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+        }
+        
+        .toc ol {
+            margin-left: 20px;
+        }
+        
+        .toc li {
+            margin-bottom: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding: 20px;
+            }
+            
+            h2 {
+                font-size: 1.6em;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            table th, table td {
+                padding: 8px;
+            }
+        }
+        
+        .highlight {
+            background: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Pygame Squares Animation</h1>
+            <p>Architecture Documentation & System Design</p>
+        </header>
+        
+        <main>
+            <div class="overview">
+                <strong>Overview:</strong> A pygame-based animation system featuring multiple moving squares with AI-driven behavior (fleeing and chasing), lifespan management, physics simulation, and wall collisions. The program runs at 60 FPS with real-time rendering and smooth steering mechanics.
+            </div>
+            
+            <div class="toc">
+                <h3>📋 Table of Contents</h3>
+                <ol>
+                    <li>Module Dependency Graph</li>
+                    <li>High-Level System Architecture</li>
+                    <li>Square Data Structure</li>
+                    <li>Main Game Loop Execution Flow</li>
+                    <li>Interaction System (AI Steering)</li>
+                    <li>Physics System (Collision & Movement)</li>
+                    <li>Lifespan & Respawn System</li>
+                    <li>Rendering Pipeline</li>
+                    <li>Key Configuration Constants</li>
+                    <li>Entry Point & Initialization</li>
+                    <li>Data Flow Diagram</li>
+                    <li>Code Sections Breakdown</li>
+                </ol>
+            </div>
+            
+            <section id="section-1">
+                <h2>1. Module Dependency Graph</h2>
+                <p>Shows how the main game loop depends on Python libraries and external packages.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    PY["Python Standard Library"]
+    PYGAME["pygame (External)"]
+    MATH["math (Standard)"]
+    RANDOM["random (Standard)"]
+    TIME["time (Standard)"]
+    
+    MAIN["main.py<br/>(Primary Game Loop)"]
+    
+    FLEEING["fleeingfeature.py<br/>(Archive)"]
+    LIFESPAN["lifespan.py<br/>(Archive)"]
+    
+    PY --> MAIN
+    PYGAME --> MAIN
+    MATH --> MAIN
+    RANDOM --> MAIN
+    TIME --> MAIN
+    
+    style MAIN fill:#4CAF50,stroke:#333,stroke-width:2px,color:#fff
+    style FLEEING fill:#FFA726,stroke:#333,stroke-width:1px,color:#fff
+    style LIFESPAN fill:#FFA726,stroke:#333,stroke-width:1px,color:#fff
+    style PYGAME fill:#42A5F5,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-2">
+                <h2>2. High-Level System Architecture</h2>
+                <p>The system is composed of five major subsystems that operate together on shared game state.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph LR
+    INPUT["Input Handler<br/>(Events)"]
+    SPAWN["Spawn/Respawn<br/>System"]
+    INTERACT["Interaction<br/>System<br/>(AI)"]
+    PHYSICS["Physics Engine<br/>(Movement &<br/>Collisions)"]
+    RENDER["Rendering<br/>System"]
+    STATE["Game State<br/>(Squares List)"]
+    
+    INPUT --> STATE
+    SPAWN --> STATE
+    INTERACT --> STATE
+    PHYSICS --> STATE
+    STATE --> RENDER
+    
+    style INPUT fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
+    style SPAWN fill:#4ECDC4,stroke:#333,stroke-width:2px,color:#fff
+    style INTERACT fill:#95E1D3,stroke:#333,stroke-width:2px,color:#fff
+    style PHYSICS fill:#F38181,stroke:#333,stroke-width:2px,color:#fff
+    style RENDER fill:#AA96DA,stroke:#333,stroke-width:2px,color:#fff
+    style STATE fill:#FCBAD3,stroke:#333,stroke-width:2px,color:#000
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-3">
+                <h2>3. Square Data Structure</h2>
+                <p>Each entity in the game is represented as a dictionary with the following properties:</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TD
+    SQUARE["Square Entity"]
+    POS["pos: list[x, y]<br/>(top-left corner)"]
+    VEL["vel: list[dx, dy]<br/>(velocity vector)"]
+    SIZE["size: int<br/>(pixels)"]
+    COLOR["color: tuple<br/>(RGB)"]
+    BIRTH["birth: float<br/>(spawn timestamp)"]
+    LIFE["life: float<br/>(lifespan seconds)"]
+    MAXSPEED["max_speed: float<br/>(normalized speed)"]
+    
+    SQUARE --> POS
+    SQUARE --> VEL
+    SQUARE --> SIZE
+    SQUARE --> COLOR
+    SQUARE --> BIRTH
+    SQUARE --> LIFE
+    SQUARE --> MAXSPEED
+    
+    style SQUARE fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-4">
+                <h2>4. Main Game Loop Execution Flow</h2>
+                <p>The primary control flow showing the 60 FPS frame loop and all major processing stages.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TD
+    START["🎮 Start Game<br/>Initialize pygame<br/>Create squares"]
+    CLOCK["Set Frame Rate<br/>60 FPS"]
+    LOOP_START["Frame Loop"]
+    DT["Calculate Delta Time<br/>dt = elapsed ms / 1000"]
+    CLEAR["Clear Screen<br/>Fill bg color"]
+    EVENTS["Process Events<br/>Check for QUIT"]
+    RESPAWN["Respawn System<br/>Replace expired squares"]
+    INTERACT["Interaction System<br/>Compute steering forces<br/>Update velocities"]
+    MOVEMENT["Movement System<br/>Apply velocity to position<br/>Add random wander"]
+    COLLISION["Collision Detection<br/>Bounce off walls<br/>Apply damping"]
+    ALPHA["Calculate Alpha<br/>Fade out effect"]
+    DRAW["Draw Squares<br/>with transparency"]
+    UI["Render UI<br/>FPS counter"]
+    DISPLAY["Update Display<br/>pygame.display.flip"]
+    END_LOOP{">60 FPS<br/>elapsed?"}
+    QUIT{"User quit?"}
+    END["🛑 Exit<br/>pygame.quit()"]
+    
+    START --> CLOCK
+    CLOCK --> LOOP_START
+    LOOP_START --> DT
+    DT --> CLEAR
+    CLEAR --> EVENTS
+    EVENTS --> RESPAWN
+    RESPAWN --> INTERACT
+    INTERACT --> MOVEMENT
+    MOVEMENT --> COLLISION
+    COLLISION --> ALPHA
+    ALPHA --> DRAW
+    DRAW --> UI
+    UI --> DISPLAY
+    DISPLAY --> END_LOOP
+    END_LOOP -->|Wait for frame| LOOP_START
+    EVENTS --> QUIT
+    QUIT -->|Yes| END
+    QUIT -->|No| RESPAWN
+    
+    style START fill:#4CAF50,stroke:#333,stroke-width:2px,color:#fff
+    style END fill:#F44336,stroke:#333,stroke-width:2px,color:#fff
+    style INTERACT fill:#95E1D3,stroke:#333,stroke-width:2px,color:#000
+    style COLLISION fill:#F38181,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-5">
+                <h2>5. Interaction System (AI Steering)</h2>
+                <p>The AI behavior determines how squares move relative to each other based on size comparison. Larger squares chase smaller ones, while smaller squares flee from larger ones.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TD
+    ITER_START["For each square s1"]
+    GET_CENTER["Get center position<br/>of s1"]
+    STEER_INIT["Initialize<br/>steer_x = 0<br/>steer_y = 0"]
+    
+    ITER_OTHER["For each other square s2"]
+    SKIP{">Same square?"}
+    GET_CENTER2["Get center position<br/>of s2"]
+    CALC_DIST["Calculate distance<br/>between s1 and s2"]
+    CHECK_DIST{">Distance <br/>FLEE_DISTANCE<br/>(150px)?"}
+    
+    NORM_DIR["Normalize direction vector<br/>from s1 to s2"]
+    SIZE_CHECK{">s1.size ><br/>s2.size?"}
+    CHASE["Chase:<br/>steer += direction<br/>(move toward)"]
+    FLEE["Flee:<br/>steer -= direction<br/>(move away)"]
+    
+    APPLY_STEER["Normalize steering vector<br/>mag = hypot(steer_x, steer_y)"]
+    BLEND["Blend steering into velocity<br/>vel += (steer_norm * max_speed - vel) *<br/>STEER_FORCE (0.05)"]
+    
+    ITER_START --> GET_CENTER
+    GET_CENTER --> STEER_INIT
+    STEER_INIT --> ITER_OTHER
+    ITER_OTHER --> SKIP
+    SKIP -->|Yes| ITER_OTHER
+    SKIP -->|No| GET_CENTER2
+    GET_CENTER2 --> CALC_DIST
+    CALC_DIST --> CHECK_DIST
+    CHECK_DIST -->|No| ITER_OTHER
+    CHECK_DIST -->|Yes| NORM_DIR
+    NORM_DIR --> SIZE_CHECK
+    SIZE_CHECK -->|Yes| CHASE
+    SIZE_CHECK -->|No| FLEE
+    CHASE --> ITER_OTHER
+    FLEE --> ITER_OTHER
+    ITER_OTHER -->|No more| APPLY_STEER
+    APPLY_STEER --> BLEND
+    
+    style CHASE fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
+    style FLEE fill:#4ECDC4,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-6">
+                <h2>6. Physics System (Collision & Movement)</h2>
+                <p>Handles velocity application, random wandering, and wall collision with damping.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TD
+    FOR_EACH["For each square"]
+    
+    WANDER["Random Wandering<br/>2% chance<br/>vel += random(-10, 10)"]
+    
+    UPDATE_POS["Update Position<br/>pos += vel * dt"]
+    
+    BOUND_LEFT{">pos.x <= 0?"}
+    BOUNCE_LEFT["Bounce Left Wall:<br/>pos.x = 0<br/>vel.x = abs(vel.x) *<br/>BOUNCE_DAMPING (0.9)"]
+    
+    BOUND_RIGHT{">pos.x + size<br/>>= WIDTH?"}
+    BOUNCE_RIGHT["Bounce Right Wall:<br/>pos.x = WIDTH - size<br/>vel.x = -abs(vel.x) *<br/>BOUNCE_DAMPING"]
+    
+    BOUND_TOP{">pos.y <= 0?"}
+    BOUNCE_TOP["Bounce Top Wall:<br/>pos.y = 0<br/>vel.y = abs(vel.y) *<br/>BOUNCE_DAMPING"]
+    
+    BOUND_BOTTOM{">pos.y + size<br/>>= HEIGHT?"}
+    BOUNCE_BOTTOM["Bounce Bottom Wall:<br/>pos.y = HEIGHT - size<br/>vel.y = -abs(vel.y) *<br/>BOUNCE_DAMPING"]
+    
+    FOR_EACH --> WANDER
+    WANDER --> UPDATE_POS
+    UPDATE_POS --> BOUND_LEFT
+    BOUND_LEFT -->|Yes| BOUNCE_LEFT
+    BOUND_LEFT -->|No| BOUND_RIGHT
+    BOUNCE_LEFT --> BOUND_RIGHT
+    BOUND_RIGHT -->|Yes| BOUNCE_RIGHT
+    BOUND_RIGHT -->|No| BOUND_TOP
+    BOUNCE_RIGHT --> BOUND_TOP
+    BOUND_TOP -->|Yes| BOUNCE_TOP
+    BOUND_TOP -->|No| BOUND_BOTTOM
+    BOUNCE_TOP --> BOUND_BOTTOM
+    BOUND_BOTTOM -->|Yes| BOUNCE_BOTTOM
+    
+    style WANDER fill:#FFE082,stroke:#333,stroke-width:2px,color:#000
+    style BOUNCE_LEFT fill:#F38181,stroke:#333,stroke-width:2px,color:#fff
+    style BOUNCE_RIGHT fill:#F38181,stroke:#333,stroke-width:2px,color:#fff
+    style BOUNCE_TOP fill:#F38181,stroke:#333,stroke-width:2px,color:#fff
+    style BOUNCE_BOTTOM fill:#F38181,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-7">
+                <h2>7. Lifespan & Respawn System</h2>
+                <p>Manages entity lifecycle by removing expired squares and creating new ones with randomized properties.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TD
+    NOW["Get current time<br/>now = time.time()"]
+    FOR_SQUARE["For each square"]
+    
+    CALC_AGE["Calculate age<br/>age = now - birth_time"]
+    CHECK_LIFE{">age >=<br/>lifespan?"}
+    
+    REMOVE["Remove old square<br/>from list"]
+    
+    CREATE_NEW["Create new square:<br/>• Random size: 15-80 px<br/>• Random color<br/>• Random position<br/>• Random angle<br/>• Calculate speed"]
+    
+    APPEND["Append new square<br/>to list"]
+    
+    NOW --> FOR_SQUARE
+    FOR_SQUARE --> CALC_AGE
+    CALC_AGE --> CHECK_LIFE
+    CHECK_LIFE -->|Yes| REMOVE
+    CHECK_LIFE -->|No| FOR_SQUARE
+    REMOVE --> CREATE_NEW
+    CREATE_NEW --> APPEND
+    APPEND --> FOR_SQUARE
+    
+    style REMOVE fill:#F44336,stroke:#333,stroke-width:2px,color:#fff
+    style CREATE_NEW fill:#4ECDC4,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-8">
+                <h2>8. Rendering Pipeline</h2>
+                <p>Draws squares with alpha transparency, creating a fade-out effect as they near the end of their lifespan.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TD
+    FOR_SQUARE["For each square"]
+    
+    CALC_AGE["Calculate age<br/>age = now - birth_time"]
+    
+    CHECK_FADE{">age > lifespan - 2?"}
+    ALPHA_FULL["alpha = 255<br/>(fully opaque)"]
+    ALPHA_FADE["Calculate fade:<br/>alpha = 255 * (life - age) / 2<br/>Clamp to [0, 255]"]
+    
+    CREATE_SURF["Create surface<br/>pygame.Surface<br/>(size x size)<br/>with alpha channel"]
+    
+    FILL_COLOR["Fill surface<br/>with (r, g, b, alpha)"]
+    
+    BLIT["Blit to screen<br/>at (x, y)"]
+    
+    FOR_SQUARE --> CALC_AGE
+    CALC_AGE --> CHECK_FADE
+    CHECK_FADE -->|No| ALPHA_FULL
+    CHECK_FADE -->|Yes| ALPHA_FADE
+    ALPHA_FULL --> CREATE_SURF
+    ALPHA_FADE --> CREATE_SURF
+    CREATE_SURF --> FILL_COLOR
+    FILL_COLOR --> BLIT
+    
+    style ALPHA_FADE fill:#FFE082,stroke:#333,stroke-width:2px,color:#000
+    style BLIT fill:#AA96DA,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-9">
+                <h2>9. Key Configuration Constants</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>NUM_SQUARES</code></td>
+                            <td>15</td>
+                            <td>Initial number of squares</td>
+                        </tr>
+                        <tr>
+                            <td><code>FLEE_DISTANCE</code></td>
+                            <td>150 px</td>
+                            <td>Distance at which squares react to each other</td>
+                        </tr>
+                        <tr>
+                            <td><code>STEER_FORCE</code></td>
+                            <td>0.05</td>
+                            <td>Steering intensity (0-1 blend factor)</td>
+                        </tr>
+                        <tr>
+                            <td><code>BOUNCE_DAMPING</code></td>
+                            <td>0.9</td>
+                            <td>Energy retained after wall collision</td>
+                        </tr>
+                        <tr>
+                            <td><code>COLORS</code></td>
+                            <td>RGB tuples</td>
+                            <td>4 available colors for squares</td>
+                        </tr>
+                        <tr>
+                            <td><code>WIDTH, HEIGHT</code></td>
+                            <td>800, 600</td>
+                            <td>Screen dimensions</td>
+                        </tr>
+                        <tr>
+                            <td>Target FPS</td>
+                            <td>60</td>
+                            <td>Frame rate (clock.tick)</td>
+                        </tr>
+                        <tr>
+                            <td>Size range</td>
+                            <td>15-80 px</td>
+                            <td>Square size randomization</td>
+                        </tr>
+                        <tr>
+                            <td>Lifespan range</td>
+                            <td>12-18 s</td>
+                            <td>Square lifetime before respawn</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <section id="section-10">
+                <h2>10. Entry Point & Initialization</h2>
+                <p><strong>File:</strong> <code>main.py</code></p>
+                <h3>Initialization Sequence:</h3>
+                <ol>
+                    <li>Import libraries: <code>pygame</code>, <code>random</code>, <code>math</code>, <code>time</code></li>
+                    <li>Initialize pygame: <code>pygame.init()</code></li>
+                    <li>Create display window (800x600)</li>
+                    <li>Set window caption</li>
+                    <li>Populate <code>squares</code> list with 15 randomly configured squares</li>
+                    <li>Create game clock (60 FPS target)</li>
+                    <li>Create font for UI</li>
+                    <li>Enter main game loop</li>
+                </ol>
+            </section>
+            
+            <section id="section-11">
+                <h2>11. Data Flow Diagram</h2>
+                <p>Shows how game state flows between subsystems during each frame.</p>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph LR
+    INPUT["👤 User Input<br/>(QUIT)"]
+    CLOCK["⏱️ Clock<br/>(Frame Timing)"]
+    
+    RESPAWN["Respawn<br/>System"]
+    AI["AI Steering<br/>System"]
+    PHYSICS["Physics<br/>System"]
+    RENDER["Render<br/>System"]
+    
+    STATE["🔄 Game State<br/>(Squares List)"]
+    
+    INPUT --> STATE
+    CLOCK --> STATE
+    STATE --> RESPAWN
+    STATE --> AI
+    STATE --> PHYSICS
+    STATE --> RENDER
+    RESPAWN --> STATE
+    AI --> STATE
+    PHYSICS --> STATE
+    
+    style STATE fill:#FCBAD3,stroke:#333,stroke-width:2px,color:#000
+    style INPUT fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
+    style CLOCK fill:#FFE082,stroke:#333,stroke-width:2px,color:#000
+    style RESPAWN fill:#4ECDC4,stroke:#333,stroke-width:2px,color:#000
+    style AI fill:#95E1D3,stroke:#333,stroke-width:2px,color:#000
+    style PHYSICS fill:#F38181,stroke:#333,stroke-width:2px,color:#fff
+    style RENDER fill:#AA96DA,stroke:#333,stroke-width:2px,color:#fff
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section-12">
+                <h2>12. Code Sections Breakdown</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Location</th>
+                            <th>Responsibility</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Initialization</strong></td>
+                            <td>Lines 1-55</td>
+                            <td>Pygame setup, square creation, constants</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Main Loop Setup</strong></td>
+                            <td>Lines 56-62</td>
+                            <td>Game state & timing initialization</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Event Handling</strong></td>
+                            <td>Lines 65-68</td>
+                            <td>Input and quit event processing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Respawn System</strong></td>
+                            <td>Lines 70-86</td>
+                            <td>Lifespan tracking and square replacement</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Interaction System</strong></td>
+                            <td>Lines 88-131</td>
+                            <td>AI steering (chase/flee behavior)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Movement & Physics</strong></td>
+                            <td>Lines 133-173</td>
+                            <td>Velocity application, wall bouncing, damping</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rendering</strong></td>
+                            <td>Lines 175-193</td>
+                            <td>Square drawing with fade effect, UI text</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Display Update</strong></td>
+                            <td>Line 195</td>
+                            <td>Frame buffer swap</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cleanup</strong></td>
+                            <td>Line 197</td>
+                            <td>Pygame shutdown</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <section id="summary">
+                <h2>Summary</h2>
+                <div class="description">
+                    <h3>Key Architectural Highlights</h3>
+                    <ul>
+                        <li><strong>Object-oriented simulation</strong> using dictionary-based entity storage for flexibility</li>
+                        <li><strong>AI behavior</strong> through steering forces and size-based interaction rules</li>
+                        <li><strong>Physics simulation</strong> including velocity, collision detection, and damping</li>
+                        <li><strong>Lifespan management</strong> with time-based entity respawning for dynamic behavior</li>
+                        <li><strong>Real-time rendering</strong> with transparency and fade effects</li>
+                        <li><strong>Modular game loop</strong> separating input, update, and render phases</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Overall:</strong> The architecture demonstrates fundamental game engine concepts in approximately 200 lines of Python, suitable for educational purposes and as a foundation for more complex projects.</p>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Generated Architecture Documentation | Pygame Squares Animation Project</p>
+            <p>Diagrams created with Mermaid | Last updated: 2026</p>
+        </footer>
+    </div>
+    
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>

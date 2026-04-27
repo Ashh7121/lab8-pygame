@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Mastery - Pygame Squares Study Tool</title>
+    <!-- STUDY_TOOL_TEMPLATE_VERSION: 2.0 -->
+    <style>
+        :root {
+            --bg: #0f1419;
+            --surface: #1a1f2e;
+            --text: #e8eef5;
+            --muted: #9ca3af;
+            --accent: #667eea;
+            --accent-dark: #764ba2;
+            --success: #10b981;
+            --error: #ef4444;
+            --radius: 8px;
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2d1b4e 100%);
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        #app {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 1.05em;
+        }
+
+        .section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #study-summary h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        #study-summary ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #study-summary li {
+            padding: 8px 0;
+            color: var(--text);
+            border-left: 3px solid var(--accent);
+            padding-left: 12px;
+            margin-bottom: 6px;
+        }
+
+        #mode-switcher {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Flashcard Styles */
+        #flashcard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .flashcard {
+            perspective: 1000px;
+            cursor: pointer;
+            height: 320px;
+            border-radius: var(--radius);
+            background: transparent;
+            border: none;
+            padding: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .flashcard:hover {
+            transform: scale(1.02);
+        }
+
+        .flashcard:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.is-flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: var(--radius);
+            font-size: 0.95em;
+            line-height: 1.5;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .flashcard-front {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            transform: rotateY(180deg);
+            box-shadow: var(--shadow);
+        }
+
+        .flashcard-front::after {
+            content: "Click to reveal";
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.75em;
+            opacity: 0.7;
+        }
+
+        /* Quiz Styles */
+        #quiz {
+            display: none;
+        }
+
+        #quiz.active {
+            display: block;
+        }
+
+        #quiz-content {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 25px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            min-height: 300px;
+        }
+
+        .question-number {
+            color: var(--accent);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .question-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: var(--accent);
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: var(--accent);
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .option.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .option.incorrect {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 10px 16px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            padding: 12px 24px;
+            background: var(--success);
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        .submit-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 100%);
+            transition: width 0.3s ease;
+        }
+
+        /* Results Styles */
+        #quiz-results {
+            display: none;
+        }
+
+        #quiz-results.active {
+            display: block;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .score-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .score-number {
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .score-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+
+        .answers-review {
+            margin-top: 30px;
+        }
+
+        .answer-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid transparent;
+        }
+
+        .answer-item.correct {
+            border-left-color: var(--success);
+        }
+
+        .answer-item.incorrect {
+            border-left-color: var(--error);
+        }
+
+        .answer-question {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .answer-details {
+            font-size: 0.9em;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .answer-explanation {
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        .reset-btn:hover {
+            background: var(--accent-dark);
+        }
+
+        /* Hidden state */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            #flashcard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flashcard {
+                height: 250px;
+            }
+
+            #mode-switcher {
+                flex-direction: column;
+            }
+
+            .quiz-nav {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+
+            .submit-btn {
+                margin-left: 0;
+                margin-top: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>🎮 Project Mastery</h1>
+            <p>Pygame Squares Animation Study Tool</p>
+        </header>
+
+        <section id="study-summary" class="section">
+            <h2>📚 Study Summary</h2>
+            <ul>
+                <li><strong>AI Steering Logic:</strong> Size-based chase/flee behavior with normalized vectors and smooth blending</li>
+                <li><strong>Physics Simulation:</strong> Delta-time movement, wall collisions with damping, and random wandering</li>
+                <li><strong>Entity Lifecycle:</strong> Time-based respawning with lifespan management and transparency effects</li>
+                <li><strong>Performance Optimization:</strong> Inverse speed calculation, steering force normalization, and frame-based timing</li>
+                <li><strong>Game Loop Architecture:</strong> Event handling, state updates, and rendering pipeline with 60 FPS target</li>
+            </ul>
+        </section>
+
+        <section id="mode-switcher" class="section">
+            <button class="mode-btn active" onclick="switchMode('flashcards')">🃏 Flashcards</button>
+            <button class="mode-btn" onclick="switchMode('quiz')">❓ Quiz</button>
+        </section>
+
+        <section id="flashcards" class="section">
+            <div id="flashcard-grid"></div>
+        </section>
+
+        <section id="quiz" class="section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div id="quiz-content"></div>
+            <div class="quiz-nav"></div>
+            <div id="quiz-results"></div>
+        </section>
+    </div>
+
+    <script>
+        // ============ DATA DEFINITIONS ============
+        const flashcards = [
+            {
+                front: "What happens to a square's velocity after bouncing off a wall?",
+                back: "It reflects direction and is reduced by BOUNCE_DAMPING (0.9). For example, if moving at 100 px/s into a wall, it bounces back at 90 px/s.",
+                concept: "Physics - Wall Collisions"
+            },
+            {
+                front: "How does size affect a square's speed in main.py?",
+                back: "Inversely: smaller squares move faster. Formula: speed = (30 / size) * 150. A 30px square moves at 150 px/s, but a 60px square only moves at 75 px/s.",
+                concept: "Entity Properties - Speed Scaling"
+            },
+            {
+                front: "What determines if a square chases or flees another square?",
+                back: "Size comparison. Bigger squares chase smaller ones. Smaller squares flee from bigger ones. This creates predator-prey dynamics within FLEE_DISTANCE (150px).",
+                concept: "AI Logic - Chase/Flee Decision"
+            },
+            {
+                front: "How is the steering force applied smoothly in main.py?",
+                back: "Uses STEER_FORCE (0.05) as a blend factor: vel += (steer_norm * max_speed - vel) * 0.05. This creates gradual direction changes instead of instant turns.",
+                concept: "Steering Mechanics - Smooth Blending"
+            },
+            {
+                front: "What role does delta time (dt) play in movement calculations?",
+                back: "Ensures frame-rate independent movement. Position updates use: pos += vel * dt. At 60 FPS, dt ≈ 0.0167s. Higher FPS = smaller dt = smoother animation.",
+                concept: "Physics - Frame-Rate Independence"
+            },
+            {
+                front: "In the respawn system, why create a new speed calculation instead of reusing max_speed?",
+                back: "Because new_size is randomly generated (15-80px), requiring a fresh speed = (30 / new_size) * 150 calculation. Using old max_speed would apply incorrect physics to a different-sized square.",
+                concept: "Debugging - Incorrect State Transfer"
+            },
+            {
+                front: "If STEER_FORCE was 0.5 instead of 0.05, what would change visually?",
+                back: "Squares would turn much sharper and faster toward targets. Higher STEER_FORCE = more aggressive steering. At 0.5, changes would feel jerky; at 0.05, they feel natural and smooth.",
+                concept: "Debugging - Parameter Tuning Effects"
+            },
+            {
+                front: "What could go wrong if you removed the 'if steer_x != 0 or steer_y != 0' check?",
+                back: "When a square has no nearby neighbors, steer_x=0 and steer_y=0. Without the check, dividing by zero when normalizing (mag = hypot(0, 0)) causes a crash or NaN velocity.",
+                concept: "Debugging - Edge Case - Zero Vector"
+            },
+            {
+                front: "Why normalize direction vectors before accumulating steering forces?",
+                back: "Ensures each nearby square contributes equally regardless of distance. Without normalization, distant neighbors would have tiny vectors and nearby ones huge vectors, causing unbalanced behavior.",
+                concept: "Design Tradeoff - Vector Normalization"
+            },
+            {
+                front: "What's the design reason for using time.time() instead of frame counting for lifespan?",
+                back: "Frame counting is FPS-dependent; time.time() is not. With real time, lifespans stay 12-18 seconds regardless of FPS. With frame counts, changing target FPS would break intended behavior.",
+                concept: "Design Tradeoff - Time vs Frame Counting"
+            },
+            {
+                front: "How does the alpha fade effect work in the rendering phase?",
+                back: "In the last 2 seconds of life, alpha = 255 * (life - age) / 2, scaling from 255 to 0. Clamped with max(0, alpha). Creates smooth transparency before removal.",
+                concept: "Design Tradeoff - Fade Duration"
+            },
+            {
+                front: "What's the computational complexity of the interaction system per frame?",
+                back: "O(n²) where n = number of squares. For each square, you check all others: nested loop through 15 squares ≈ 15 * 15 = 225 distance checks per frame.",
+                concept: "Performance - Big-O Analysis"
+            },
+            {
+                front: "If you have 100 squares instead of 15, which system becomes the bottleneck first?",
+                back: "The O(n²) interaction system. 100² = 10,000 distance calculations vs O(n) physics checks. At 60 FPS, 600,000 checks/sec for interactions alone could drop frame rate.",
+                concept: "Performance - Scalability Constraint"
+            },
+            {
+                front: "Why does the code use `squares[:]` when iterating through the respawn system?",
+                back: "Creates a shallow copy of the list. Allows safe removal of items (via squares.remove(s)) during iteration without skipping or index errors. Without `[:]`, loop can skip elements.",
+                concept: "Edge Case - Safe List Mutation"
+            },
+            {
+                front: "What happens if a square's position equals exactly a wall boundary (pos.x = 0)?",
+                back: "The condition 'if pos.x <= 0' triggers, setting pos.x = 0 and bouncing velocity. If exactly 0, abs(vel.x) * 0.9 fires. Multiple bounces in one frame could stack, but damping prevents runaway.",
+                concept: "Edge Case - Boundary Conditions"
+            }
+        ];
+
+        const quizData = [
+            {
+                question: "In main.py, a square with size=20 is moving at a certain speed. According to the speed formula, what is that speed? (Hint: speed = (30 / size) * 150)",
+                options: ["50 px/s", "150 px/s", "225 px/s", "300 px/s"],
+                correct: 2,
+                explanation: "Using speed = (30 / 20) * 150 = 1.5 * 150 = 225 px/s. The inverse relationship means smaller squares move faster.",
+                file: "main.py",
+                region: "Lines 43, 89 (speed calculation)"
+            },
+            {
+                question: "During steering normalization in the interaction system, after normalizing steer_x and steer_y by dividing by mag, what should mag represent?",
+                options: ["The distance to nearest square", "The magnitude of the steering vector (hypot(steer_x, steer_y))", "The frame delta time", "The STEER_FORCE constant"],
+                correct: 1,
+                explanation: "mag = math.hypot(steer_x, steer_y) calculates the vector's length. Dividing by mag creates a unit vector with length 1, ensuring consistent steering direction.",
+                file: "main.py",
+                region: "Lines 121-124 (steering normalization)"
+            },
+            {
+                question: "If FLEE_DISTANCE was reduced from 150 to 50 pixels, how would square behavior change?",
+                options: ["Squares would collide more often", "Squares would only react when very close, ignoring far-away threats", "AI would compute faster due to fewer interactions", "Squares would move slower"],
+                correct: 1,
+                explanation: "The check 'if 0 < dist < FLEE_DISTANCE' controls reaction range. Smaller distance = smaller reaction radius = late reactions to nearby squares.",
+                file: "main.py",
+                region: "Line 113 (distance check)"
+            },
+            {
+                question: "In the respawn system, why does the code iterate through `squares[:]` (a copy) instead of `squares` directly?",
+                options: ["To improve performance by reducing references", "To safely remove items during iteration without skipping elements", "To sort the squares by age", "To prevent threading issues"],
+                correct: 1,
+                explanation: "Iterating over a copy allows safe removal of items from the original list during iteration. Without the copy, removing s from squares while looping causes skipped iterations.",
+                file: "main.py",
+                region: "Line 77 (respawn loop)"
+            },
+            {
+                question: "When two squares are exactly at FLEE_DISTANCE pixels apart (dist = 150), what happens?",
+                options: ["They interact because 150 < 150 is false", "They react immediately because dist = FLEE_DISTANCE", "They don't interact because the condition requires dist < 150, not <=", "They swap velocities"],
+                correct: 2,
+                explanation: "The condition is 'if 0 < dist < FLEE_DISTANCE', which excludes the boundary (150 is not < 150). They must be strictly inside the range to react.",
+                file: "main.py",
+                region: "Line 113 (distance check)"
+            },
+            {
+                question: "What would happen if you forgot to normalize the direction vector (nx, ny) before using it in steering?",
+                options: ["Squares would move faster", "Close squares would dominate steering, distant ones would have tiny influence, causing jerky unpredictable behavior", "Nothing; normalization is optional", "Alpha values would break"],
+                correct: 1,
+                explanation: "Without normalization, the raw dx, dy can be very large (distant squares) or tiny. Non-normalized vectors would create unbalanced force accumulation and erratic steering.",
+                file: "main.py",
+                region: "Lines 109-111 (direction vector)"
+            },
+            {
+                question: "In the fade-out effect, what is the calculation during the last 2 seconds of a square's life?",
+                options: ["alpha = 255 / (life - age)", "alpha = 255 * (life - age) / 2", "alpha = 255 - life + age", "alpha = age / life"],
+                correct: 1,
+                explanation: "Line 185: alpha = int(255 * (s['life'] - age) / 2). When age = life - 2, alpha = 255. When age = life, alpha = 0. Linear fade over 2 seconds.",
+                file: "main.py",
+                region: "Lines 184-186 (alpha calculation)"
+            },
+            {
+                question: "During wall collision on the left edge (pos.x <= 0), why is vel.x set to abs(vel.x) * BOUNCE_DAMPING instead of -vel.x * BOUNCE_DAMPING?",
+                options: ["Negative damping would slow the square permanently", "abs() ensures the velocity points away from the wall (positive), then damping reduces speed", "It's a bug in the code", "BOUNCE_DAMPING is already negative"],
+                correct: 1,
+                explanation: "abs(vel.x) ensures the reflected velocity points right (away from left wall). For right wall, it's negated: -abs(vel.x). Damping (0.9) reduces speed in both cases.",
+                file: "main.py",
+                region: "Lines 162-173 (wall bouncing)"
+            },
+            {
+                question: "The interaction system checks 'if i == j: continue'. What does this prevent?",
+                options: ["Infinite loops in the game", "A square from chasing/fleeing itself, which would cause NaN in distance calculation", "Collisions with walls", "Color conflicts"],
+                correct: 1,
+                explanation: "If i == j, the square is comparing itself to itself. Distance would be 0, causing undefined behavior (dividing by zero when normalizing, or infinitely strong steering).",
+                file: "main.py",
+                region: "Lines 102-103 (self-comparison check)"
+            },
+            {
+                question: "What is the computational complexity of the interaction system (steering forces) per frame?",
+                options: ["O(n) where n = number of squares", "O(n²) where n = number of squares", "O(log n)", "O(1) constant time"],
+                correct: 1,
+                explanation: "Nested loops: for each square s1 (n iterations), check all other squares (n iterations). Total: n * n = O(n²). With 15 squares: 225 distance calculations per frame.",
+                file: "main.py",
+                region: "Lines 99-131 (nested loop)"
+            },
+            {
+                question: "If you doubled NUM_SQUARES from 15 to 30, how many times more work does the interaction system do?",
+                options: ["2x more work", "4x more work", "8x more work", "30x more work"],
+                correct: 1,
+                explanation: "O(n²) scales quadratically. Doubling n (15 → 30) quadruples work: (30² / 15²) = (900 / 225) = 4x. This is a major scalability issue.",
+                file: "main.py",
+                region: "Lines 99-131 (interaction loop)"
+            },
+            {
+                question: "Why does the code calculate 'center' (c1 and c2) for distance calculations instead of using top-left corners (pos)?",
+                options: ["For accuracy; distance between corners would be incorrect", "To make steering aim at the square's center rather than corner, ensuring fair interactions", "It's faster to use centers", "To avoid negative coordinates"],
+                correct: 1,
+                explanation: "Using centers ensures all squares are treated equally regardless of size. Steering toward the corner of a large square would aim at its edge, creating bias.",
+                file: "main.py",
+                region: "Lines 100-101 (center calculation)"
+            },
+            {
+                question: "In the respawn system, a square dies when age >= life. If life = 15 and age = 14.9999, does the square respawn?",
+                options: ["Yes, because it's close enough to 15", "No, because age < life still", "Yes, always", "Depends on FPS"],
+                correct: 1,
+                explanation: "The condition is 'if age >= s['life']'. At age=14.9999, this is false (14.9999 < 15). The square only respawns when age reaches exactly 15 or beyond.",
+                file: "main.py",
+                region: "Line 80 (lifespan check)"
+            },
+            {
+                question: "What could break if you removed the 'alpha = max(0, alpha)' clamp in the fade calculation?",
+                options: ["Frame rate would drop", "Alpha could go negative, causing undefined rendering behavior and potentially visible glitches", "Colors would shift", "Squares wouldn't respawn"],
+                correct: 1,
+                explanation: "Without clamp, alpha = 255 * (15 - 16) / 2 = -255 when age exceeds life. Negative alpha values cause undefined behavior in pygame rendering.",
+                file: "main.py",
+                region: "Lines 184-186 (alpha clamping)"
+            },
+            {
+                question: "If dt (delta time) doubles due to frame lag, how does position update?",
+                options: ["Position stays the same", "Position += vel * (2 * dt) = moves twice as far, maintaining consistent speed over real time", "Position -= vel * dt", "Position multiplies by FPS"],
+                correct: 1,
+                explanation: "pos += vel * dt is frame-rate independent. If FPS drops and dt doubles, movement distance doubles, keeping real-world speed constant. Lag doesn't slow the game.",
+                file: "main.py",
+                region: "Line 155 (position update)"
+            }
+        ];
+
+        // ============ STATE MANAGEMENT ============
+        let quizState = {
+            currentQuestion: 0,
+            answers: [],
+            submitted: false
+        };
+
+        // ============ INITIALIZATION ============
+        function init() {
+            initializeFlashcards();
+            initializeQuizDOM();
+            validateDOM();
+        }
+
+        function initializeFlashcards() {
+            const grid = document.getElementById('flashcard-grid');
+            grid.innerHTML = '';
+            flashcards.forEach((card, idx) => {
+                const cardEl = document.createElement('button');
+                cardEl.className = 'flashcard';
+                cardEl.tabIndex = 0;
+                cardEl.role = 'button';
+                cardEl.innerHTML = `
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">${card.front}</div>
+                        <div class="flashcard-back">${card.back}</div>
+                    </div>
+                `;
+                cardEl.addEventListener('click', () => toggleFlip(cardEl));
+                cardEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleFlip(cardEl);
+                    }
+                });
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function toggleFlip(cardEl) {
+            cardEl.classList.toggle('is-flipped');
+        }
+
+        function initializeQuizDOM() {
+            const quizContent = document.getElementById('quiz-content');
+            quizContent.innerHTML = '';
+            quizData.forEach((q, idx) => {
+                const qEl = document.createElement('div');
+                qEl.id = `q-${idx}`;
+                qEl.style.display = idx === 0 ? 'block' : 'none';
+                qEl.innerHTML = `
+                    <div class="question-number">Question ${idx + 1} of ${quizData.length}</div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="question-options">
+                        ${q.options.map((opt, oidx) => `
+                            <div class="option" data-qidx="${idx}" data-oidx="${oidx}">${opt}</div>
+                        `).join('')}
+                    </div>
+                `;
+                quizContent.appendChild(qEl);
+            });
+
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.addEventListener('click', selectOption);
+            });
+
+            updateQuizNav();
+        }
+
+        function updateQuizNav() {
+            const navContainer = document.querySelector('.quiz-nav');
+            navContainer.innerHTML = '';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'nav-btn';
+            prevBtn.textContent = '← Previous';
+            prevBtn.disabled = quizState.currentQuestion === 0;
+            prevBtn.onclick = () => {
+                if (quizState.currentQuestion > 0) {
+                    quizState.currentQuestion--;
+                    showQuestion(quizState.currentQuestion);
+                }
+            };
+            navContainer.appendChild(prevBtn);
+
+            const questionNav = document.createElement('div');
+            questionNav.style.marginLeft = 'auto';
+            questionNav.textContent = `${quizState.currentQuestion + 1} / ${quizData.length}`;
+            questionNav.style.alignSelf = 'center';
+            questionNav.style.color = 'var(--accent)';
+            navContainer.appendChild(questionNav);
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'nav-btn';
+            nextBtn.textContent = 'Next →';
+            nextBtn.disabled = quizState.currentQuestion === quizData.length - 1;
+            nextBtn.onclick = () => {
+                if (quizState.currentQuestion < quizData.length - 1) {
+                    quizState.currentQuestion++;
+                    showQuestion(quizState.currentQuestion);
+                }
+            };
+            navContainer.appendChild(nextBtn);
+
+            if (quizState.currentQuestion === quizData.length - 1) {
+                const submitBtn = document.createElement('button');
+                submitBtn.className = 'submit-btn';
+                submitBtn.textContent = '📊 Submit Quiz';
+                submitBtn.onclick = submitQuiz;
+                navContainer.appendChild(submitBtn);
+            }
+
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = ((quizState.currentQuestion + 1) / quizData.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function showQuestion(idx) {
+            const questions = document.querySelectorAll('[id^="q-"]');
+            questions.forEach((q, i) => {
+                q.style.display = i === idx ? 'block' : 'none';
+            });
+
+            const selectedAnswer = quizState.answers[idx];
+            if (selectedAnswer !== undefined) {
+                const opts = document.querySelectorAll(`#q-${idx} .option`);
+                opts[selectedAnswer].classList.add('selected');
+            }
+
+            updateQuizNav();
+        }
+
+        function selectOption(e) {
+            const qidx = parseInt(e.target.dataset.qidx);
+            const oidx = parseInt(e.target.dataset.oidx);
+
+            document.querySelectorAll(`#q-${qidx} .option`).forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            e.target.classList.add('selected');
+            quizState.answers[qidx] = oidx;
+        }
+
+        function submitQuiz() {
+            quizState.submitted = true;
+
+            const score = quizState.answers.reduce((sum, ans, idx) => {
+                return sum + (ans === quizData[idx].correct ? 1 : 0);
+            }, 0);
+
+            const resultsContainer = document.getElementById('quiz-results');
+            resultsContainer.innerHTML = `
+                <div class="score-display">
+                    <div class="score-circle">
+                        <div class="score-number">${score}/${quizData.length}</div>
+                        <div class="score-label">Points</div>
+                    </div>
+                    <div class="score-text">${getScoreMessage(score, quizData.length)}</div>
+                </div>
+                <div class="answers-review">
+                    <h3>📋 Answer Review</h3>
+                    ${quizData.map((q, idx) => {
+                        const userAnswer = quizState.answers[idx];
+                        const isCorrect = userAnswer === q.correct;
+                        return `
+                            <div class="answer-item ${isCorrect ? 'correct' : 'incorrect'}">
+                                <div class="answer-question">Q${idx + 1}: ${q.question}</div>
+                                <div class="answer-details">
+                                    Your answer: <strong>${q.options[userAnswer] || 'Not answered'}</strong>
+                                </div>
+                                ${!isCorrect ? `<div class="answer-details">Correct answer: <strong>${q.options[q.correct]}</strong></div>` : ''}
+                                <div class="answer-explanation">📌 ${q.explanation}</div>
+                                <div class="answer-details" style="margin-top: 8px; color: var(--accent);">Source: ${q.file} - ${q.region}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <button class="reset-btn" onclick="resetQuiz()">🔄 Try Again</button>
+            `;
+            resultsContainer.classList.add('active');
+
+            document.getElementById('quiz-content').style.display = 'none';
+            document.querySelector('.quiz-nav').style.display = 'none';
+        }
+
+        function resetQuiz() {
+            quizState = {
+                currentQuestion: 0,
+                answers: [],
+                submitted: false
+            };
+            document.getElementById('quiz-results').classList.remove('active');
+            document.getElementById('quiz-results').innerHTML = '';
+            document.getElementById('quiz-content').style.display = 'block';
+            document.querySelector('.quiz-nav').style.display = 'flex';
+            showQuestion(0);
+        }
+
+        function getScoreMessage(score, total) {
+            const percent = (score / total) * 100;
+            if (percent === 100) return "🌟 Perfect score! You're a pygame master!";
+            if (percent >= 80) return "🎯 Excellent work! You understand the core concepts.";
+            if (percent >= 60) return "👍 Good job! Review the missed questions.";
+            if (percent >= 40) return "📖 Keep studying! Focus on the red sections.";
+            return "💪 Keep practicing! Review all concepts.";
+        }
+
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.style.display = sec.id === 'study-summary' || sec.id === 'mode-switcher' ? 'block' : 'none';
+            });
+
+            if (mode === 'flashcards') {
+                document.querySelector('[onclick="switchMode(\'flashcards\')"]').classList.add('active');
+                document.getElementById('flashcards').style.display = 'block';
+            } else if (mode === 'quiz') {
+                document.querySelector('[onclick="switchMode(\'quiz\')"]').classList.add('active');
+                document.getElementById('quiz').classList.add('active');
+                document.getElementById('quiz').style.display = 'block';
+            }
+        }
+
+        function validateDOM() {
+            const required = [
+                { id: 'quiz-content', type: 'element' },
+                { id: 'quiz-results', type: 'element' },
+                { selector: '.quiz-nav', type: 'selector' },
+                { id: 'flashcard-grid', type: 'element' }
+            ];
+
+            let validationPassed = true;
+            required.forEach(item => {
+                let exists = false;
+                if (item.type === 'element') {
+                    exists = document.getElementById(item.id) !== null;
+                    if (!exists) console.error(`[DOM VALIDATION FAILED] Element not found: #${item.id}`);
+                } else if (item.type === 'selector') {
+                    exists = document.querySelector(item.selector) !== null;
+                    if (!exists) console.error(`[DOM VALIDATION FAILED] Selector not found: ${item.selector}`);
+                }
+                validationPassed = validationPassed && exists;
+            });
+
+            const flashcardCount = document.querySelectorAll('.flashcard').length;
+            const questionCount = document.querySelectorAll('[id^="q-"]').length;
+            console.log(`[DOM VALIDATION] Flashcards: ${flashcardCount}, Questions: ${questionCount}`);
+
+            if (validationPassed) {
+                console.log('[DOM VALIDATION] ✓ All required elements present and valid');
+            } else {
+                console.error('[DOM VALIDATION FAILED] Critical elements missing!');
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
