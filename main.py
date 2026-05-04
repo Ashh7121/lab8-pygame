@@ -16,11 +16,11 @@ FLEE_DISTANCE = 150
 STEER_FORCE = 0.05   
 BOUNCE_DAMPING = 0.9  
 
-# Define the specific starting mix withh (count, size)
+# Define the specific starting mix (count, size)
 POPULATION_MIX = [(5, 25), (10, 10), (30, 4)]
 
 def create_square(size):
-    """generate a square dict based on a specific size"""
+    """Generate a square dict based on a specific size"""
     color = random.choice(COLORS)
     x = random.uniform(0, WIDTH - size)
     y = random.uniform(0, HEIGHT - size)
@@ -42,7 +42,7 @@ def create_square(size):
         'max_speed': speed
     }
 
-# ex1 initial squares
+# Initial population setup
 squares = []
 for count, size in POPULATION_MIX:
     for _ in range(count):
@@ -65,13 +65,14 @@ while running:
             running = False
 
     # -------------------- RESPAWN SYSTEM --------------------
+    # iterate over a copy of the list [:] to remove items in a safr way
     for s in squares[:]:
         age = now - s['birth']
         if age >= s['life']:
-            # get the old size before removing so we maintain the mix
+            # get the size of the dying square
             old_size = s['size']
             squares.remove(s)
-            # Respawn a new one of the same size
+            # Respawn a new square with that same size
             squares.append(create_square(old_size))
 
     # -------------------- INTERACTION SYSTEM --------------------
@@ -89,15 +90,15 @@ while running:
             if 0 < dist < FLEE_DISTANCE:
                 nx, ny = dx / dist, dy / dist
                 if s1['size'] > s2['size']:
-                    # Predator behavior
+                    # Predator behavior: Move toward smaller squares
                     steer_x += nx
                     steer_y += ny
                 elif s1['size'] < s2['size']:
-                    # Prey behavior
+                    # Prey behavior: Move away from larger squares
                     steer_x -= nx
                     steer_y -= ny
 
-        # Apply steering
+        # Apply steering forces to velocity
         if steer_x != 0 or steer_y != 0:
             mag = math.hypot(steer_x, steer_y)
             steer_x, steer_y = steer_x / mag, steer_y / mag
@@ -106,7 +107,7 @@ while running:
 
     # -------------------- MOVEMENT + PHYSICS --------------------
     for s in squares:
-        # Wandering
+        # Slight random wandering
         if random.random() < 0.02:
             s['vel'][0] += random.uniform(-10, 10)
             s['vel'][1] += random.uniform(-10, 10)
@@ -114,7 +115,7 @@ while running:
         s['pos'][0] += s['vel'][0] * dt
         s['pos'][1] += s['vel'][1] * dt
 
-        # Wall Bounce
+        # Wall Collision Logic
         if s['pos'][0] <= 0:
             s['pos'][0] = 0
             s['vel'][0] = abs(s['vel'][0]) * BOUNCE_DAMPING
@@ -129,13 +130,14 @@ while running:
             s['pos'][1] = HEIGHT - s['size']
             s['vel'][1] = -abs(s['vel'][1]) * BOUNCE_DAMPING
 
-        # Fade Out and Draw
+        # Fade Out effect based on age
         age = now - s['birth']
         alpha = 255
         if age > s['life'] - 2:
             alpha = int(255 * (s['life'] - age) / 2)
             alpha = max(0, alpha)
 
+        # Drawing the square with transparency support
         surf = pygame.Surface((s['size'], s['size']), pygame.SRCALPHA)
         surf.fill((*s['color'], alpha))
         screen.blit(surf, (int(s['pos'][0]), int(s['pos'][1])))
