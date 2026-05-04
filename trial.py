@@ -8,17 +8,18 @@ pygame.init()
 
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Moving Squares: Predator, Prey, and Eating")
+pygame.display.set_caption("Moving Squares")
 
 # -------------------- SETTINGS --------------------
 COLORS = [(255, 50, 50), (50, 255, 50), (50, 50, 255), (255, 255, 50)]
 FLEE_DISTANCE = 150  
 STEER_FORCE = 0.05   
+MAX_SQUARE_SIZE = 100 # Growth cap to prevent one square from taking over the screen
 
 # Define the specific starting mix (count, size)
 POPULATION_MIX = [(5, 25), (10, 10), (30, 4)]
 
-def create_square(size):
+def create_square(size, initial_mix_size=None):
     """Generate a square dict based on a specific size"""
     color = random.choice(COLORS)
     x = random.uniform(0, WIDTH - size)
@@ -35,6 +36,7 @@ def create_square(size):
         'pos': [x, y],
         'vel': [dx, dy],
         'size': size,
+        'original_type_size': initial_mix_size if initial_mix_size else size,
         'color': color,
         'birth': time.time(),
         'life': random.uniform(12, 18),
@@ -47,11 +49,15 @@ def check_collision(s1, s2):
     rect2 = pygame.Rect(s2['pos'][0], s2['pos'][1], s2['size'], s2['size'])
     return rect1.colliderect(rect2)
 
+def update_speed_for_size(s):
+    """Recalculate speed based on new size (Bigger = Slower)"""
+    s['max_speed'] = (30 / s['size']) * 150
+
 # Initial squares
 squares = []
 for count, size in POPULATION_MIX:
     for _ in range(count):
-        squares.append(create_square(size))
+        squares.append(create_square(size, initial_mix_size=size))
 
 # -------------------- GAME LOOP SETUP --------------------
 running = True
@@ -72,16 +78,14 @@ while running:
     # -------------------- RESPAWN SYSTEM --------------------
     for s in squares[:]:
         age = now - s['birth']
-        # If age exceeds life, or if marked as eaten (basicaly dead)
         if age >= s['life']:
-            old_size = s['size']
+            # Respawn using the original mix size, not the grown size
+            respawn_size = s['original_type_size']
             squares.remove(s)
-            # Respawn with original size
-            squares.append(create_square(old_size))
+            squares.append(create_square(respawn_size, initial_mix_size=respawn_size))
 
     # -------------------- INTERACTION SYSTEM --------------------
     for i, s1 in enumerate(squares):
-        # Skip if this square was already eaten in this frame's earlier loop
         if (now - s1['birth']) >= s1['life']: continue
 
         c1 = [s1['pos'][0] + s1['size']/2, s1['pos'][1] + s1['size']/2]
@@ -89,23 +93,28 @@ while running:
         
         for j, s2 in enumerate(squares):
             if i == j: continue
-            # Skip if the other square is already dead
             if (now - s2['birth']) >= s2['life']: continue
             
-            # Collision & eating logic
+            #Collision & eating++
             if check_collision(s1, s2):
                 if s1['size'] > s2['size']:
-                    # s1 eats s2: set s2's life to 0 so it respawns
-                    s2['life'] = 0 
+                    # Predator (s1) eats Prey (s2)
+                    growth = s2['size'] * 0.67 # Predator grows by 67% of prey size
+                    s1['size'] = min(MAX_SQUARE_SIZE, s1['size'] + growth)
+                    update_speed_for_size(s1) # Slow down predator
+                    s2['life'] = 0 # Mark prey for respawn
                 elif s2['size'] > s1['size']:
-                    # s2 eats s1: set s1's life to 0
-                    s1['life'] = 0
+                    # Predator (s2) eats Prey (s1)
+                    growth = s1['size'] * 0.20
+                    s2['size'] = min(MAX_SQUARE_SIZE, s2['size'] + growth)
+                    update_speed_for_size(s2)
+                    s1['life'] = 0 
                 else:
-                    # Same size: Simple bounce
+                    # Same size: Bounce
                     s1['vel'][0], s2['vel'][0] = s2['vel'][0], s1['vel'][0]
                     s1['vel'][1], s2['vel'][1] = s2['vel'][1], s1['vel'][1]
 
-            # Steering Behavior (Predator Prey)
+            # steering Behavior
             c2 = [s2['pos'][0] + s2['size']/2, s2['pos'][1] + s2['size']/2]
             dx, dy = c2[0] - c1[0], c2[1] - c1[1]
             dist = math.hypot(dx, dy)
@@ -119,7 +128,7 @@ while running:
                     steer_x -= nx
                     steer_y -= ny
 
-        # Apply Steering
+        # Apply Steering Forces
         if steer_x != 0 or steer_y != 0:
             mag = math.hypot(steer_x, steer_y)
             steer_x, steer_y = steer_x / mag, steer_y / mag
