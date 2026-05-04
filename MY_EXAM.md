@@ -1,2 +1,4 @@
 I am currently at the trails feature and now that I've implemented it, I don't know
 what exact issue I was supposed to run into but I suppose one thing I'm seeing off is that when the squares get bigger when they eat and get slower, the trails get shorter and disappear. I suppose it's a simple fix by increasing the length.
+
+The speed test is basically just a digital ruler and stopwatch. To make sure the math actually holds up, I isolate one square and let it run in a straight line without any interference from the other squares or random wandering. Once the test starts, the code marks its exact starting spot and time, then waits exactly one second. After that second is up, it uses the distance formula, basically a quick Pythagorean calculation to see how many pixels the square actually covered. If that number matches the speed value we set in the variables, we know the delta-time and physics engine are perfectly in sync.
