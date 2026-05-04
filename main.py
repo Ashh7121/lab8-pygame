@@ -8,7 +8,7 @@ pygame.init()
 
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Moving Squares yay")
+pygame.display.set_caption("Moving Squares: Predator, Prey, and Eating")
 
 # -------------------- SETTINGS --------------------
 COLORS = [(255, 50, 50), (50, 255, 50), (50, 50, 255), (255, 255, 50)]
@@ -72,31 +72,40 @@ while running:
     # -------------------- RESPAWN SYSTEM --------------------
     for s in squares[:]:
         age = now - s['birth']
+        # If age exceeds life, or if marked as eaten (basicaly dead)
         if age >= s['life']:
             old_size = s['size']
             squares.remove(s)
+            # Respawn with original size
             squares.append(create_square(old_size))
 
-    # -------------------- INTERACTION & COLLISION --------------------
+    # -------------------- INTERACTION SYSTEM --------------------
     for i, s1 in enumerate(squares):
+        # Skip if this square was already eaten in this frame's earlier loop
+        if (now - s1['birth']) >= s1['life']: continue
+
         c1 = [s1['pos'][0] + s1['size']/2, s1['pos'][1] + s1['size']/2]
         steer_x, steer_y = 0, 0 
         
         for j, s2 in enumerate(squares):
             if i == j: continue
+            # Skip if the other square is already dead
+            if (now - s2['birth']) >= s2['life']: continue
             
-            # physical collision detection
+            # Collision & eating logic
             if check_collision(s1, s2):
-                # swap velocities
-                s1['vel'][0], s2['vel'][0] = s2['vel'][0], s1['vel'][0]
-                s1['vel'][1], s2['vel'][1] = s2['vel'][1], s1['vel'][1]
-                
-                # Sseparation logic to prevent overlapping & sticking
-                overlap_fix = 2
-                if s1['pos'][0] < s2['pos'][0]: s1['pos'][0] -= overlap_fix
-                else: s1['pos'][0] += overlap_fix
+                if s1['size'] > s2['size']:
+                    # s1 eats s2: set s2's life to 0 so it respawns
+                    s2['life'] = 0 
+                elif s2['size'] > s1['size']:
+                    # s2 eats s1: set s1's life to 0
+                    s1['life'] = 0
+                else:
+                    # Same size: Simple bounce
+                    s1['vel'][0], s2['vel'][0] = s2['vel'][0], s1['vel'][0]
+                    s1['vel'][1], s2['vel'][1] = s2['vel'][1], s1['vel'][1]
 
-            # 2. Steering Behavior (Predator/Prey)
+            # Steering Behavior (Predator Prey)
             c2 = [s2['pos'][0] + s2['size']/2, s2['pos'][1] + s2['size']/2]
             dx, dy = c2[0] - c1[0], c2[1] - c1[1]
             dist = math.hypot(dx, dy)
@@ -137,7 +146,7 @@ while running:
         alpha = int(255 * (s['life'] - age) / 2) if age > s['life'] - 2 else 255
         alpha = max(0, min(255, alpha))
 
-        surf = pygame.Surface((s['size'], s['size']), pygame.SRCALPHA)
+        surf = pygame.Surface((int(s['size']), int(s['size'])), pygame.SRCALPHA)
         surf.fill((*s['color'], alpha))
         screen.blit(surf, (int(s['pos'][0]), int(s['pos'][1])))
 
