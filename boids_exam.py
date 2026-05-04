@@ -53,7 +53,15 @@ class Boid:
 
     # TODO: Implement speed clamping to ensure boids don't exceed max speed
     def _clampSpeed(self) -> None:
-        pass
+        current_speed = math.hypot(self.vx, self.vy)
+        if current_speed > config.BOID_SPEED_MAX:
+            scale = config.BOID_SPEED_MAX / current_speed
+            self.vx *= scale
+            self.vy *= scale
+        elif current_speed < config.BOID_SPEED_MIN and current_speed > 0:
+            scale = config.BOID_SPEED_MIN / current_speed
+            self.vx *= scale
+            self.vy *= scale
 
     # TODO: Implement Screen Wrapping
     # Screen wrapping: if a boid goes off one edge of the screen, 
@@ -163,7 +171,23 @@ class Boid:
         # and apply the corresponding steering forces to the boid's velocity 
         # using the defined strengths (*_STEER_STRENGTH) for each behavior.
 
+        if config.SEPARATION_ON:
+            sep_force = self._separation(boids)
+            self.vx += sep_force.x * config.SEPARATION_STEER_STRENGTH * dt_seconds
+            self.vy += sep_force.y * config.SEPARATION_STEER_STRENGTH * dt_seconds
+
+        if config.ALIGNEMENT_ON:
+            ali_force = self._alignment(boids)
+            self.vx += ali_force.x * config.ALIGNEMENT_STEER_STRENGTH * dt_seconds
+            self.vy += ali_force.y * config.ALIGNEMENT_STEER_STRENGTH * dt_seconds
+
+        if config.COHESION_ON:
+            coh_force = self._cohesion(boids)
+            self.vx += coh_force.x * config.COHESION_STEER_STRENGTH * dt_seconds
+            self.vy += coh_force.y * config.COHESION_STEER_STRENGTH * dt_seconds
+
         self._random_steer()
+        self._clampSpeed()
 
         # Update the boid's position based on its velocity.
         self.x += self.vx * dt_seconds
