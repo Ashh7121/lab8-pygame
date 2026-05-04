@@ -68,7 +68,7 @@ while running:
     for s in squares[:]:
         age = now - s['birth']
         if age >= s['life']:
-            # Capture the size before removing so we maintain the mix
+            # get the old size before removing so we maintain the mix
             old_size = s['size']
             squares.remove(s)
             # Respawn a new one of the same size
