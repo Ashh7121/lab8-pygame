@@ -15,6 +15,7 @@ COLORS = [(255, 50, 50), (50, 255, 50), (50, 50, 255), (255, 255, 50)]
 FLEE_DISTANCE = 150  
 STEER_FORCE = 0.05   
 MAX_SQUARE_SIZE = 100 # Growth cap to prevent one square from taking over the screen
+TRAILS_LENGTH = 30 # How many past positions we keep track of
 
 # Define the specific starting mix (count, size)
 POPULATION_MIX = [(5, 25), (10, 10), (30, 4)]
@@ -40,7 +41,8 @@ def create_square(size, initial_mix_size=None):
         'color': color,
         'birth': time.time(),
         'life': random.uniform(12, 18),
-        'max_speed': speed
+        'max_speed': speed,
+        'history': [] # list to hold our trail points
     }
 
 def check_collision(s1, s2):
@@ -137,6 +139,14 @@ while running:
 
     # -------------------- MOVEMENT + WRAPPING --------------------
     for s in squares:
+        # record the center of the square for the trail before moving
+        center_pos = (s['pos'][0] + s['size'] / 2, s['pos'][1] + s['size'] / 2)
+        s['history'].append(center_pos)
+        
+        # trim the history so it doesn't grow forever
+        if len(s['history']) > TRAILS_LENGTH:
+            s['history'].pop(0)
+
         if random.random() < 0.02:
             s['vel'][0] += random.uniform(-10, 10)
             s['vel'][1] += random.uniform(-10, 10)
@@ -145,10 +155,23 @@ while running:
         s['pos'][1] += s['vel'][1] * dt
 
         # Screen Wrapping
-        if s['pos'][0] > WIDTH: s['pos'][0] = -s['size']
-        elif s['pos'][0] < -s['size']: s['pos'][0] = WIDTH
-        if s['pos'][1] > HEIGHT: s['pos'][1] = -s['size']
-        elif s['pos'][1] < -s['size']: s['pos'][1] = HEIGHT
+        if s['pos'][0] > WIDTH: 
+            s['pos'][0] = -s['size']
+            s['history'] = [] # clear trail on wrap to avoid long lines across screen
+        elif s['pos'][0] < -s['size']: 
+            s['pos'][0] = WIDTH
+            s['history'] = []
+        if s['pos'][1] > HEIGHT: 
+            s['pos'][1] = -s['size']
+            s['history'] = []
+        elif s['pos'][1] < -s['size']: 
+            s['pos'][1] = HEIGHT
+            s['history'] = []
+
+        # Draw Trail
+        if len(s['history']) > 1:
+            # Connect the dots in our history list
+            pygame.draw.lines(screen, s['color'], False, s['history'], 1)
 
         # Draw
         age = now - s['birth']

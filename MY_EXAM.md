@@ -1,0 +1,2 @@
+I am currently at the trails feature and now that I've implemented it, I don't know
+what exact issue I was supposed to run into but I suppose one thing I'm seeing off is that when the squares get bigger when they eat and get slower, the trails get shorter and disappear. I suppose it's a simple fix by increasing the length.
