@@ -16,6 +16,7 @@ FLEE_DISTANCE = 150
 STEER_FORCE = 0.05   
 MAX_SQUARE_SIZE = 100 # Growth cap to prevent one square from taking over the screen
 TRAILS_LENGTH = 30 # How many past positions we keep track of
+GROWTH_DURATION = 0.5 # 500ms for the animation to complete
 
 # Define the specific starting mix (count, size)
 POPULATION_MIX = [(5, 25), (10, 10), (30, 4)]
@@ -36,7 +37,10 @@ def create_square(size, initial_mix_size=None):
     return {
         'pos': [x, y],
         'vel': [dx, dy],
-        'size': size,
+        'size': size,                # Current visual size
+        'target_size': size,         # Goal size after eating
+        'start_growth_size': size,   # Size at the moment growth started
+        'growth_timer': 0,           # Tracks animation progress
         'original_type_size': initial_mix_size if initial_mix_size else size,
         'color': color,
         'birth': time.time(),
@@ -53,7 +57,8 @@ def check_collision(s1, s2):
 
 def update_speed_for_size(s):
     """Recalculate speed based on new size (Bigger = Slower)"""
-    s['max_speed'] = (30 / s['size']) * 150
+    # Use target_size for speed so the predator slows down immediately as it eats
+    s['max_speed'] = (30 / s['target_size']) * 150
 
 # Initial squares
 squares = []
@@ -101,14 +106,19 @@ while running:
             if check_collision(s1, s2):
                 if s1['size'] > s2['size']:
                     # Predator (s1) eats Prey (s2)
-                    growth = s2['size'] * 0.67 # Predator grows by 67% of prey size
-                    s1['size'] = min(MAX_SQUARE_SIZE, s1['size'] + growth)
-                    update_speed_for_size(s1) # Slow down predator
-                    s2['life'] = 0 # Mark prey for respawn
+                    growth = s2['size'] * 0.67 
+                    # Setup animation variables
+                    s1['start_growth_size'] = s1['size']
+                    s1['target_size'] = min(MAX_SQUARE_SIZE, s1['target_size'] + growth)
+                    s1['growth_timer'] = GROWTH_DURATION 
+                    update_speed_for_size(s1) 
+                    s2['life'] = 0 
                 elif s2['size'] > s1['size']:
                     # Predator (s2) eats Prey (s1)
                     growth = s1['size'] * 0.20
-                    s2['size'] = min(MAX_SQUARE_SIZE, s2['size'] + growth)
+                    s2['start_growth_size'] = s2['size']
+                    s2['target_size'] = min(MAX_SQUARE_SIZE, s2['target_size'] + growth)
+                    s2['growth_timer'] = GROWTH_DURATION
                     update_speed_for_size(s2)
                     s1['life'] = 0 
                 else:
@@ -139,6 +149,18 @@ while running:
 
     # -------------------- MOVEMENT + WRAPPING --------------------
     for s in squares:
+        # Handle the size animation logic
+        if s['growth_timer'] > 0:
+            s['growth_timer'] -= dt
+            if s['growth_timer'] <= 0:
+                s['size'] = s['target_size']
+                s['growth_timer'] = 0
+            else:
+                # Calculate how far through the animation we are (0 to 1)
+                t = 1 - (s['growth_timer'] / GROWTH_DURATION)
+                # Linearly interpolate between start size and target size
+                s['size'] = s['start_growth_size'] + (s['target_size'] - s['start_growth_size']) * t
+
         # record the center of the square for the trail before moving
         center_pos = (s['pos'][0] + s['size'] / 2, s['pos'][1] + s['size'] / 2)
         s['history'].append(center_pos)
@@ -157,7 +179,7 @@ while running:
         # Screen Wrapping
         if s['pos'][0] > WIDTH: 
             s['pos'][0] = -s['size']
-            s['history'] = [] # clear trail on wrap to avoid long lines across screen
+            s['history'] = [] 
         elif s['pos'][0] < -s['size']: 
             s['pos'][0] = WIDTH
             s['history'] = []
@@ -170,7 +192,6 @@ while running:
 
         # Draw Trail
         if len(s['history']) > 1:
-            # Connect the dots in our history list
             pygame.draw.lines(screen, s['color'], False, s['history'], 1)
 
         # Draw
